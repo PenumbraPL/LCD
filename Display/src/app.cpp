@@ -1,5 +1,7 @@
 #include "app.hpp"
 
+extern int button_pressed;
+
 typedef  void (*fun_ptr)();
 
 
@@ -81,15 +83,121 @@ void App::run(fun_ptr fun) {
     buffer.create(h, w);
     sf::Sprite bufferSprite(buffer.getTexture());
 
+    sf::Vector2u cursor(h / 2, w / 2);
+    float speed = 1. / 25;
+    //float s = 0.;
+    int div = 1;
+    bool clock_tick = false;
+    int max_r = 141;
+    
+    auto f = [&div, &clock_tick]() {
+        float speed = 1. / 25;
+        //bool clock_tick = false;
+        int time = 1. / (speed);
+        //int div = 1;
 
-    while (this->isOpen())
-    {
-        sf::Event event;
-        while (this->pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                this->close();
+        if (!sf::Joystick::isConnected(0)) {
+            std::cout << "Error: Joystick not connected" << std::endl;
+            return 0;
         }
+
+        while (1) {
+            Sleep(time/div);
+            clock_tick = !clock_tick;
+            //Sleep(/const);
+        }
+        //std::cout << "Exits" << std::endl;
+    };
+    std::thread counter(f);
+    
+        while (this->isOpen())
+        {
+            sf::Event event;
+            while (this->pollEvent(event))
+            {
+                if (event.type == sf::Event::Closed) {
+                    //std::terminate();
+                    counter.detach();
+                    this->close();
+                }
+                if (event.type == sf::Event::KeyPressed) {
+                    if (event.key.code == sf::Keyboard::Left) {
+                        cursor.x--;
+                    }
+                    else if (event.key.code == sf::Keyboard::Right) {
+                        cursor.x++;
+                    }
+                    if (event.key.code == sf::Keyboard::Up) {
+                        cursor.y--;
+                    }
+                    else if (event.key.code == sf::Keyboard::Down) {
+                        cursor.y++;
+                    }
+                    if (event.key.code == sf::Keyboard::P) {
+                        button_pressed++;
+                    }
+                    if (event.key.code == sf::Keyboard::L) {
+                        button_pressed = 0;
+                    }
+                }
+            }
+
+            /*
+            if (joystick_connected) {
+                s = fabs(event.joystickMove.position) < 2 ? 0. : event.joystickMove.position;
+
+                if (clock_tick) {
+                    int sign = s / fabs(event.joystickMove.position);
+                    cursor.y += event.joystickMove.axis * sign;
+                    cursor.x += (1 - event.joystickMove.axis) * sign;
+                }
+                else {
+                    speed = fabs(s) / 1000;
+                    //std::cout << "speed:" << speed << std::endl;
+                }
+                std::cout << clock_tick << std::endl;
+
+            }
+
+            cursor.x = cursor.x >= 320 ? 319 : cursor.x;
+            cursor.y = cursor.y >= 240 ? 239 : cursor.y;
+
+            cursor.x = cursor.x <= 0 ? 0 : cursor.x;
+            cursor.y = cursor.y <= 0 ? 0 : cursor.y;
+            */
+
+            if (clock_tick) {
+                float x = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+                float y = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+                float xPosition = fabs(x) < 2 ? 0. : x / fabs(x);
+                float yPosition = fabs(y) < 2 ? 0. : y / fabs(y);
+                int r = (int)sqrt(x * x + y * y);
+                if (r > 3 * max_r / 4) {
+                    div = 4;
+                }
+                else if (r > max_r / 2) {
+                    div = 3;
+                }
+                else if (r > 1 * max_r / 4) {
+                    div = 2;
+                }
+                else {
+                    div = 1;
+                }
+
+                cursor.x += xPosition;
+                cursor.y += yPosition;
+
+                cursor.x = cursor.x >= 280 ? 279 : cursor.x;
+                cursor.y = cursor.y >= 240 ? 239 : cursor.y;
+
+                cursor.x = cursor.x <= 0 ? 0 : cursor.x;
+                cursor.y = cursor.y <= 0 ? 0 : cursor.y;
+
+            }
+
+            canvas[cursor.x * w + cursor.y] = sf::Vertex(sf::Vector2f(cursor.x, cursor.y), sf::Color::White);
+    
         this->clear();
         fun();
         std::size_t size = h * w;
@@ -98,5 +206,5 @@ void App::run(fun_ptr fun) {
         this->draw(bufferSprite);
 
         this->display();
-    }
+       }
 }

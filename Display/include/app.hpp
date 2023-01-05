@@ -1,6 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include "lsb.h"
+#include <thread>
+#include <Windows.h>
 
 #define DEBUG_PRINT(x) if(debug){ debug = debug>>1; x; }
 #define DEBUG_INIT unsigned int debug = 1;

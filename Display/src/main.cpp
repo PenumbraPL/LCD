@@ -8,7 +8,7 @@ extern "C" {
 }
 
 App app;
-
+int button_pressed = 0;
 /* ================================================================================== */
 
 
@@ -65,6 +65,36 @@ void test5() {
     printString(x, y, "String", color);
 }
 
+void test6_bg(int position) {
+    uint16_t color = 0x0000;
+    uint16_t background = 0x001F;
+    uint16_t c = color;
+    uint16_t div = 4;
+    uint16_t div_length = app.getCanvasSize().y / (div + 1);
+
+    if (position != 0) {
+        for (int i = 1; i <= div; i++) {
+            if (position == i) c = background;
+            else c = color;
+            fillRectangle(290, 319, (i - 1) * div_length+1, i * div_length-1, c);
+        }
+    }
+}
+
+void test6() {
+    uint16_t color = 0xFFFF;
+    uint16_t background = 0x001F;
+    uint16_t div = 4;
+    uint16_t div_length = app.getCanvasSize().y / (div + 1);
+
+    test4();
+    test6_bg(button_pressed);
+
+    for (int i = 1; i <= div; i++) {
+        printImage(290, i*div_length+10, i-1, color, background);
+    }
+}
+
 int main()
 {
     //app.run_demo();
@@ -73,7 +103,9 @@ int main()
     //app.run(test2);
     //app.run(test3);
     //app.run(test4);
-    app.run(test5);
+    //app.run(test5);
+    app.run(test6);
+
 
     return 0;
 }

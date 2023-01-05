@@ -28,6 +28,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
+#include <stdint.h>
+
 
 /* Private define ------------------------------------------------------------*/
 #define  ASCII_8X16_MS_Gothic   0
@@ -35,6 +37,7 @@ extern "C" {
 
 /* Private function prototypes -----------------------------------------------*/
 void GetASCIICode(int font, unsigned char* pBuffer,unsigned char ASCII);
+void GetImage(uint16_t* buffer, int img_num);
 
 #ifdef __cplusplus
 }

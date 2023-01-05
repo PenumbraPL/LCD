@@ -16,3 +16,5 @@ void BresenhamLine(const int x1, const int y1, const int x2, const int y2, uint1
 void drawcircle(int x0, int y0, int radius, uint16_t color);
 void printString(unsigned short x, unsigned short y, const char* stringToPrint, uint16_t bgColor);
 void fillRectangle(uint16_t xStart, uint16_t xEnd, uint16_t yStart, uint16_t yEnd, uint16_t color);
+void printImage(unsigned short x, unsigned short y, unsigned int img, uint16_t color, uint16_t bgColor);
+
